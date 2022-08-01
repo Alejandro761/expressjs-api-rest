@@ -26,16 +26,23 @@ router.get('/filter', (req, res) => {
 //resquest.params guarda los parametros del endpoint
 router.get('/:id', (request, response) => {
     const {id} = request.params; //request.params.id
-    response.json({
-        id,
-        name: 'Product 3',
-        price: 25890
-    })
+
+    if(id === '999') {
+        response.status(404).json({
+            message: 'not found'
+        })
+    } else {
+        response.status(200).json({
+            id,
+            name: 'Product 3',
+            price: 25890
+        })
+    }
 })
 
 router.post('/', (req, res) => {
     const body = req.body;
-    res.json({
+    res.status(201).json({
         message: 'created',
         data: body
     })
