@@ -3,7 +3,7 @@ const routerAppi  = require('./routes'); //ya sabe que debe ir a index.js
 const app = express()
 const port = 3000;
 
-app.use(express.json())
+app.use(express.json()) //para que el post pueda enviarnos su body
 
 app.get('/', (request, response) => {
     response.send('Hola mi server en express')
