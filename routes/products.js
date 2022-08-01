@@ -3,8 +3,8 @@ const ProductService = require('../services/product')
 const router = express.Router() //creamos el router de los productos //primer paso
 const service = new ProductService()
 
-router.get('/', (request, response) => {
-    const products = service.find()
+router.get('/', async (request, response) => {
+    const products = await service.find()
     // const { size } = request.query;
     
     response.json(products)
@@ -16,31 +16,37 @@ router.get('/filter', (req, res) => {
 })
 
 //resquest.params guarda los parametros del endpoint
-router.get('/:id', (request, response) => {
+router.get('/:id', async (request, response) => {
     const {id} = request.params; //request.params.id
 
-    const product = service.findOne(id);
+    const product = await service.findOne(id);
     response.json(product);
 })
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const body = req.body;
-    const newProduct = service.create(body)
+    const newProduct = await service.create(body)
 
     res.status(201).json(newProduct)
 })
 
-router.patch('/:id', (req, res) => {
-    const { id } = req.params
-    const body = req.body;
-    const product = service.update(id, body)
-    
-    res.json(product)
+router.patch('/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const body = req.body;
+        const product = await service.update(id, body)
+        
+        res.json(product)
+    } catch (error) {
+        res.status(404).json({
+            message: error.message
+        })
+    }
 })
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     const { id } = req.params
-    const product = service.delete(id)
+    const product = await service.delete(id)
 
     res.json(product)
 })
