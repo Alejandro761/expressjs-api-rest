@@ -16,11 +16,15 @@ router.get('/filter', (req, res) => {
 })
 
 //resquest.params guarda los parametros del endpoint
-router.get('/:id', async (request, response) => {
-    const {id} = request.params; //request.params.id
+router.get('/:id', async (request, response, next) => {
+    try {
+        const {id} = request.params; //request.params.id
 
-    const product = await service.findOne(id);
-    response.json(product);
+        const product = await service.findOne(id);
+        response.json(product);
+    } catch (error) {
+        next(error)
+    }
 })
 
 router.post('/', async (req, res) => {
@@ -39,7 +43,7 @@ router.patch('/:id', async (req, res) => {
         res.json(product)
     } catch (error) {
         res.status(404).json({
-            message: error.message
+            message: error.message //en message se gurada el mensaje del error
         })
     }
 })
