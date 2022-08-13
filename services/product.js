@@ -1,4 +1,5 @@
 const faker = require('faker')
+const boom = require('@hapi/boom')
 
 class ProductService {
 
@@ -15,7 +16,8 @@ class ProductService {
                 id: faker.datatype.uuid(),
                 name: faker.commerce.productName(),
                 precio: parseInt(faker.commerce.price()),
-                image: faker.image.imageUrl()
+                image: faker.image.imageUrl(),
+                isBlock: faker.datatype.boolean()
             })
         }
     }
@@ -39,29 +41,36 @@ class ProductService {
     }
     
     async findOne(id) {
-        const name = this.getHi()
-        return this.products.find(product => product.id === id);
+        // const name = this.getHi() //para forzar el middleware de error
+        const product = this.products.find(product => product.id === id);
+        if (!product) {
+            throw boom.notFound('Product not found')
+        }
+        if (product.isBlock) {
+            throw boom.conflict('Product is block')
+        }
+        return product
     }
 
     async update(id, changes) {
         const index = this.products.findIndex(product => product.id === id)
         
         if (index === -1){
-            throw new Error('Product not found')
+            throw boom.notFound('Product not found')
         }
-
+        
         this.products[index] = {
             ...this.products[index],
             ...changes
         }
         return this.products[index]
     }
-
+    
     async delete(id) {
         const index = this.products.findIndex(product => product.id === id)
         
         if (index === -1){
-            throw new Error('Product not found')
+            throw boom.notFound('Product not found')
         }
         
         this.products.splice(index, 1)
