@@ -1,4 +1,6 @@
 const express = require('express')
+const { validatorHandler } = require('../middlewares/validator.handler')
+const { getProductSchema, createProductSchema, updateProductSchema } = require('../schemas/product.schema')
 const ProductService = require('../services/product')
 const router = express.Router() //creamos el router de los productos //primer paso
 const service = new ProductService()
@@ -16,35 +18,46 @@ router.get('/filter', (req, res) => {
 })
 
 //resquest.params guarda los parametros del endpoint
-router.get('/:id', async (request, response, next) => {
-    try {
-        const {id} = request.params; //request.params.id
+router.get('/:id',
+    validatorHandler( getProductSchema, 'params' ), //que primero valide, si es valido entonces sigue, getProductSchema validara que sea un id
+    async (request, response, next) => {
+        try {
+            const {id} = request.params; //request.params.id
 
-        const product = await service.findOne(id);
-        response.json(product);
-    } catch (error) {
-        next(error) //ejecuta el middleware
+            const product = await service.findOne(id);
+            response.json(product);
+        } catch (error) {
+            next(error) //ejecuta el middleware
+        }
     }
-})
+)
 
-router.post('/', async (req, res) => {
-    const body = req.body;
-    const newProduct = await service.create(body)
-
-    res.status(201).json(newProduct)
-})
-
-router.patch('/:id', async (req, res, next) => {
-    try {
-        const { id } = req.params
+router.post('/', 
+    validatorHandler( createProductSchema, 'body'),
+    async (req, res) => {
         const body = req.body;
-        const product = await service.update(id, body)
-        
-        res.json(product)
-    } catch (error) {
-        next(error)
+        const newProduct = await service.create(body)
+        res.status(201).json(newProduct)
     }
-})
+)
+
+router.patch('/:id', 
+    //primero validamos que cumpla con la estructura del id
+    validatorHandler( getProductSchema, 'params'), 
+    //despues valido que nos envie un body de actualizacion
+    validatorHandler( updateProductSchema, 'body'),
+    async (req, res, next) => {
+        try {
+            const { id } = req.params
+            const body = req.body;
+            const product = await service.update(id, body)
+
+            res.json(product)
+        } catch (error) {
+            next(error)
+        }
+    }
+)
 
 router.delete('/:id', async (req, res) => {
     const { id } = req.params
