@@ -23,7 +23,7 @@ router.get('/:id', async (request, response, next) => {
         const product = await service.findOne(id);
         response.json(product);
     } catch (error) {
-        next(error)
+        next(error) //ejecuta el middleware
     }
 })
 
