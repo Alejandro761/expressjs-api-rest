@@ -1,3 +1,3 @@
 #npm i nodemon eslint eslint-config-prettier eslint-plugin-prettier prettier -D (el guion D es para indicarle que son dependencias para desarrollo)
 node_modules
-#npm i express joi @hapi/boom
+#npm i express joi @hapi/boom cors
